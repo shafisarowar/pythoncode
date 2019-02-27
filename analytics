@@ -1,0 +1,49 @@
+import nltk
+from nltk.tokenize import RegexpTokenizer
+from nltk.stem import WordNetLemmatizer
+from gensim import corpora, models
+
+documents = ["A survey of user opinion of computer system response time",
+"The EPS user interface management system",
+"System and human system engineering testing of EPS",
+"Relation of user perceived response time to error measurement",
+"The generation of random binary unordered trees",
+"The intersection graph of paths in trees",
+"Graph minors IV Widths of trees and well quasi ordering",
+"Graph minors A survey"]
+
+tokenized_docs = []
+
+for item in documents:
+    tokens = item.split()
+    tokenized_docs.append(tokens)
+
+print(tokenized_docs)
+
+########## Doing Lemmatization for Verbs
+
+lemmaed_texts_v = []
+wnl = WordNetLemmatizer()
+
+for item in tokenized_docs:
+    lemmaed_tokens = [wnl.lemmatize(i, pos='v') for i in item]
+    #add tokens to list
+    lemmaed_texts_v.append(lemmaed_tokens)
+    
+print("printing lemmaed text")
+
+print(lemmaed_texts_v)
+
+
+# Testing Gensim
+dictionary = corpora.Dictionary(tokenized_docs)
+
+# Converting list of documents (corpus) into Document Term Matrix or Bag of words using dictionary prepared above.
+doc_term_matrix = [dictionary.doc2bow(doc) for doc in tokenized_docs]
+
+# generate LDA model
+ldamodel = models.LdaMulticore(doc_term_matrix, num_topics=3, workers=4, id2word = dictionary, passes=40)
+
+
+ldamodel.show_topics(num_topics=3, num_words=20)
+
